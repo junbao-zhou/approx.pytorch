@@ -1,0 +1,14 @@
+*
+
+!.gitignore
+!.gitattributes
+
+!src
+!model
+
+!CMakeLists.txt
+
+!Dockerfile
+!docker-compose.yml
+
+!*.py

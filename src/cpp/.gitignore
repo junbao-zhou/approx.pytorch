@@ -1,0 +1,10 @@
+!*.cu
+!*.cuh
+!*.cc
+!*.cpp
+!*.h
+!CMakeLists.txt
+
+!include
+
+approx_mul_dict.cpp

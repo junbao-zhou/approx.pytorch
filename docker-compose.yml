@@ -1,0 +1,31 @@
+version: '3'
+services:
+  pytorch:
+    image: localhost:5000/pytorch-cuda:1.6.0-cuda10.1-cudnn7-devel
+    container_name: pytorch
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0", "1", "2", "3", "4", "5", "6", "7"]
+              capabilities: [gpu]
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "22222:22"
+    command: /bin/bash
+    volumes:
+      - type: bind
+        source: .
+        target: /root/work_dir
+      - type: volume
+        source: vscode-server-pytorch
+        target: /root/.vscode-server
+
+
+volumes:
+  vscode-server-pytorch:
+    external: true
+    name: vscode-server-pytorch
