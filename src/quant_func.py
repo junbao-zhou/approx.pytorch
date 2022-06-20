@@ -56,7 +56,7 @@ def model_fp32_to_int8(model_fp32, valid_loader, is_fuse=True, is_train=False):
     return model_int8
 
 
-BATCH_SIZE = 128
+BATCH_SIZE = 64
 model_dir = '../model/'
 
 
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     MODEL_NAME = getattr(importlib.import_module("model"), args.model_name)
     _, valid_loader = data_loader(
-        args.dataset_name, BATCH_SIZE, is_normalize=True, is_augment=False, image_net_out_size=224, is_shuffle_valid_loader=True)
+        args.dataset_name, BATCH_SIZE, is_normalize=True, is_augment=False, image_net_out_size=(227 if args.dataset_name == 'ImageNet' else 224), is_shuffle_valid_loader=True)
 
     model_fp32 = q_model.ModelQuant(MODEL_NAME(args.n_classes)).to(DEVICE)
     MODEL_PATH = f'{model_dir}{type(model_fp32.layers).__name__}-{args.dataset_name}.model'
@@ -112,7 +112,7 @@ if __name__ == '__main__':
 
     q_model.IS_APPROX = args.is_approx
 
-    IS_CUDA = False
+    IS_CUDA = True
     model_int8_replaced = q_model.replace_layers(model_int8, is_cuda=IS_CUDA)
     print(f"""\
     model_int8_replaced : 

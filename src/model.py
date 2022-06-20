@@ -227,6 +227,10 @@ class VGG11_32x32(VGG11):
         for i in [3,4,5]:
             self.classifier[i] = nn.Identity()
 
+class AlexNet(models.AlexNet):
+    def __init__(self, num_classes=1000):
+        super(AlexNet, self).__init__(num_classes)
+
 if __name__ == '__main__':
     from data_loader import data_loader
     # train_loader, valid_loader = data_loader('CIFAR10', 1)

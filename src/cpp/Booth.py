@@ -205,8 +205,11 @@ def partial_products_approx_gen(booth_codes, b, bits, approx_bits):
 
 
 def trunc(b, trunc_bit, last_bit):
-    return set_low_bits(
-        b, trunc_bit, last_bit << (trunc_bit - 1))
+    if trunc_bit <= 1:
+        return b
+    else:
+        return set_low_bits(
+            b, trunc_bit, last_bit << (trunc_bit - 1))
 
 
 def partial_sum_gen(partial_products, bits, booth_codes, is_neg=['add']*4):
@@ -253,6 +256,10 @@ def four_2(a, b, c, d):
         return 1
     elif a and b and c and d:
         return -1
+    elif (not a) and (not b) and (not c) and (not d):
+        return 1
+    elif (a) and (b) and (not c) and (not d):
+        return 1
     else:
         return 0
 
@@ -276,10 +283,10 @@ def booth_mul(a, b, bits):
 def booth_mul_approx(a, b, bits):
     assert (bits == 8) or (bits == 16)
     booth_codes = booth_encoder_radix_4(a, bits)
-    pps = partial_products_approx_gen(booth_codes, b, bits, [5, 5, 5, 5])
+    pps = partial_products_approx_gen(booth_codes, b, bits, [8, 10, 10, 10])
     p_sums = partial_sum_gen(
         pps, bits, booth_codes,
-        is_neg=['or', 'or', 'or', 'add'])
+        is_neg=['add', 'add', 'add', 'add'])
     res = partial_product_compress(p_sums, bits)
     # if b == 0:
     #     res = 0
@@ -291,15 +298,15 @@ def booth_mul_approx_trunc(a, b, bits):
     booth_codes = booth_encoder_radix_4(a, bits)
     trunc_bit = 7
     pps = partial_products_approx_gen(
-        booth_codes, b, bits, [5, 5, 5, 0])
-    pps = trunc_partial_product(pps, booth_codes, [5, 5, 0, 0])
+        booth_codes, b, bits, [7, 7, 7, 0])
+    pps = trunc_partial_product(pps, booth_codes, [7, 7, 7, 0])
     p_sums = partial_sum_gen(
         pps, bits, booth_codes,
-        is_neg=['trunc', 'trunc', 'add', 'add'])
+        is_neg=['trunc', 'trunc', 'trunc', 'or'])
     res = partial_product_compress(p_sums, bits)
-    # res += four_2_err(p_sums, 7)
-    # if b == 0:
-    #     res = 0
+    res += four_2_err(p_sums, 7)
+    if b == 0:
+        res = 0
     return res
 
 

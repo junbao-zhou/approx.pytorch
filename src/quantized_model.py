@@ -8,10 +8,10 @@ import torch.nn.functional as F
 from torch import Tensor
 from util import *
 from model import *
-from torchvision.models import AlexNet
+import torchvision.models as models
 
-IS_OUTPUT_VAR = True
-IS_CUDA = False
+IS_OUTPUT_VAR = False
+IS_CUDA = True
 IS_APPROX = True
 if IS_CUDA:
     from torch.utils.cpp_extension import load
@@ -59,14 +59,14 @@ def fuse_model(model):
         elif type(m) == LinearActivion:
             quantization.fuse_modules(
                 m, ['linear', 'act'], inplace=True)
-        elif type(m) == AlexNet:
+        elif type(m) == AlexNet or type(m) == models.AlexNet:
             quantization.fuse_modules(
                 m, FUSE_MODELS_DICT[type(m)], inplace=True)
             return
         elif type(m) == QResNet18 or type(m) == QResNet18_32x32:
             m.fuse_model()
             return
-        elif type(m) == VGG16 or type(m) == VGG16_32x32:
+        elif type(m) == VGG16 or type(m) == VGG16_32x32 or type(m) == VGG11 or type(m) == VGG11_32x32:
             modules_names = [m_name for m_name, _ in m.named_modules()]
             modules_list = [m_child for m_child in m.modules()]
             for ind, m_child in enumerate(modules_list):

@@ -39,8 +39,11 @@ def gen_data(input_datas, input_bits, output_bits, func):
 
 
 def gen_data_cpp(input_datas, input_bits, output_bits, func):
-    with open("y_cpp.txt", 'w') as f_out:
-        f_out.write('const int16_t mul_dict[] = {')
+    with open("approx_mul_dict.cpp", 'w') as f_out:
+        f_out.write("""#include <stdint.h>
+#include "approx_mul_dict.h"
+
+const int16_t mul_dict[] = {""")
         for x in input_datas:
             f_out.write(
                 str(to_signed(func(x) & n_bits_1(output_bits), output_bits)))
@@ -51,10 +54,10 @@ def gen_data_cpp(input_datas, input_bits, output_bits, func):
 if __name__ == '__main__':
     # gen_data(0xFFFF, 3, 3, lambda num : booth_code(num).to_bits())
     # gen_data(range(0x10000), 16, 16, mul)
-    gen_data(range(0x10000), 16, 16,
-             lambda a_b: booth_mul_approx_trunc((a_b & 0xFF00) >> 8, (a_b & 0xFF), 8))
+    # gen_data(range(0x10000), 16, 16,
+    #          lambda a_b: booth_mul_approx_trunc((a_b & 0xFF00) >> 8, (a_b & 0xFF), 8))
     gen_data_cpp(range(0x10000), 16, 16,
-                 lambda a_b: booth_mul_approx((a_b & 0xFF00) >> 8, (a_b & 0xFF), 8))
+                 lambda a_b: booth_mul_approx_trunc((a_b & 0xFF00) >> 8, (a_b & 0xFF), 8))
     # gen_data(0xFFF, 2, 1, nand)
     # gen_data(0x10000, 2, 1, xor)
     # print(n_bits_1(16))
